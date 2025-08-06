@@ -1,8 +1,8 @@
 %Relative motion
 
-close all; clear all;
-addpath(genpath("C:\Users\kelly\OneDrive\Desktop\GitHub\SOL_Coding_Repo"));  %add sol coding repo to file path
-addpath(genpath('C:\Projects\Max_wrist_movement'));  %add sol coding repo to file path
+close all; clear all;clc;
+addpath(genpath('C:\Users\kelly\GitHub\KellyGodkin'));  %add sol coding repo to file path
+addpath(genpath('C:\Users\kelly\GitHub'));  %add sol coding repo to file path
 
 %% Variables
 bone_registered = 11;
@@ -18,7 +18,7 @@ for b = 1:length(boneindex)
 end
 
 %%
-for s = 1:length(directory_neutral)
+for s = 1:length(subject)
     %%
     info = getSubjectFilePath(directory_neutral{s},hand);
     
@@ -59,7 +59,7 @@ for s = 1:length(directory_neutral)
     if flag == 1
         for p = 1:length(p1)
             
-            for b = 7:15
+            for b = 1:15
                 boneregp1.(subject{s}).(p1{p,1}).(bonecode(b)) = bone.(subject{s}).(p1{p,1}).(bonecode(bone_registered)).transform^-1* bone.(subject{s}).(p1{p,1}).(bonecode(b)).transform;
                 boneregp2.(subject{s}).(p1{p,2}).(bonecode(b)) = bone.(subject{s}).(p1{p,2}).(bonecode(bone_registered)).transform^-1* bone.(subject{s}).(p1{p,2}).(bonecode(b)).transform;
                 Transformation_matrix.(bonecode(b)) =  boneregp2.(subject{s}).(p1{p,2}).(bonecode(b))*boneregp1.(subject{s}).(p1{p,1}).(bonecode(b))^-1;
@@ -77,7 +77,7 @@ for s = 1:length(directory_neutral)
     end
 
     for p = 1:length(p1)
-        for b = 7:15
+        for b = 1:15
 
             q = bone.(subject{s}).helical.(p1{p,1}).(p1{p,2}).(bonecode(b))(:,2);
             n = bone.(subject{s}).helical.(p1{p,1}).(p1{p,2}).(bonecode(b))(:,1);
@@ -99,8 +99,22 @@ for s = 1:length(directory_neutral)
                                   
             
 
-            colour = lines(15); % preset matlab colour schemes
-            
+            % colour = lines(15); % preset matlab colour schemes
+            colour = [0.7,0.7,0.7;
+                0.7,0.7,0.7;
+                0.7,0.7,0.7;
+                0.7,0.7,0.7;
+                0.7,0.7,0.7;
+                0.7,0.7,0.7;
+                0.0670, 0.4430, 0.7450;
+                0.8200, 0.0160, 0.5450;
+                0.8670, 0.3290, 0;
+                0.929, 0.694, 0.1250;
+                0.7,0.7,0.7;
+                0.7,0.7,0.7;
+                0.7,0.7,0.7;
+                0.7,0.7,0.7;
+                0.7,0.7,0.7];
         
             filename_temp = append('\IV.files\',bonecode(b),'15',hand,'.iv');
             ivstring = [ivstring createInventorLink(fullfile(info.neutralSeriesPath,filename_temp), boneregp2.(subject{s}).(p1{p,2}).(bonecode(b))(1:3,1:3), boneregp2.(subject{s}).(p1{p,2}).(bonecode(b))(1:3,4)', colour(b,:), 0.3)];
@@ -108,7 +122,7 @@ for s = 1:length(directory_neutral)
         
             %Neutral original position
             ivstring = [ivstring createInventorLink(fullfile(info.neutralSeriesPath,filename_temp), boneregp1.(subject{s}).(p1{p,1}).(bonecode(b))(1:3,1:3), boneregp1.(subject{s}).(p1{p,1}).(bonecode(b))(1:3,4)', [0.7 0.7 0.7], 0.3)]; %registered position (cyan)
-            if b ~= bone_registered
+            for b = 7:10
                 ivstring = [ivstring createInventorArrow(bone.(subject{s}).helical.(p1{p,1}).(p1{p,2}).(bonecode(b))(1:3,2)', bone.(subject{s}).helical.(p1{p,1}).(p1{p,2}).(bonecode(b))(1:3,1)', 25, 0.5, colour(b,:), 0)];
             end
             
@@ -194,7 +208,7 @@ for p = 1:length(p2)
 
 end
 
-
+save(fullfile('C:\Users\kelly\Desktop\ISB_25','bone.mat'),'bone')
 
 
 end
@@ -206,8 +220,8 @@ for s = 1:length(subject)
 
     for b = 1:length(boneindex)
         bones_wanted(b,:) = bone.relative_angle.(subject{s})(boneindex(b),:);
-        phi_wanted(b,:) = bone.phi_relative.(subject{s})(boneindex(b),:);
-        I = find(phi_wanted(b,:)<=5);
+        phi_wanted(b,:) = bone.phi.(subject{s})(boneindex(b),:);
+        I = find(phi_wanted(b,:)<=1);
         for X = 1:length(I)
             bones_wanted(b,I(1,X)) = NaN;
         end
@@ -217,7 +231,7 @@ for s = 1:length(subject)
     z = x+54;
     all_bones(:,x:z) = bones_wanted(:,:);
     all_phi(:,x:z) = phi_wanted(:,:); 
-
+    
     % figure(s)
     % 
     % hold on
@@ -243,6 +257,7 @@ for s = 1:length(subject)
 end
 
 %% Plot gen
+
 
 
 phi_mean = mean(all_phi')'
@@ -315,6 +330,11 @@ end
 % 
 % end
 
+for b = 1:length(boneindex)
+    phi_diff(b,:) = all_phi(b,:)-all_phi(2,:);
+    mean_phi_diff(b,:) = nanmean(phi_diff(b,:) );
+    mean_phi_diff_abs(b,:) = nanmean(abs(phi_diff(b,:)) );
+end
 
 for b = 1:length(boneindex)
     [h,p,ci,stats] = ttest(all_phi(b,:));
@@ -327,12 +347,14 @@ for b = 1:length(boneindex)
     bone.ttest.df(b,length(subject)+2) = stats.df;
     bone.ttest.tstast(b,length(subject)+2) = stats.tstat;
     % bone.ttest(b,1) = nan;
-    combined(1,:) = [{'bone'},{'p value'},{'sd'},{'mean phi'},{'mean phi tpm'},{'abs mean phi tpm'}];
-    % mean_phi2 = mean_phi(boneindex,:)
-    combined(b+1,:) = [{bonecode(boneindex(b))}, bone.ttest.p(b,length(subject)+2), bone.ttest.sd(b,length(subject)+2),mean_phi(boneindex(b),:), phi_mean(b,:),abs_phi_mean(b,:)] ;
-    % [{bonecode(boneindex(b))}, bone.ttest.p(b,length(subject)+2), bone.ttest.sd(b,length(subject)+2)];
+    combined(1,:) = [{'bone'},{'p value'},{'sd'},{'mean phi'},{'abs mean phi tpm'},{'difference phi mean'},{'abs difference phi mean'}];
+    mean_phi2 = mean_phi(boneindex,:);
+    combined(b+1,:) = [{bonecode(boneindex(b))}, bone.ttest.p(b,length(subject)+2), bone.ttest.sd(b,length(subject)+2), phi_mean(b,:),abs_phi_mean(b,:),mean_phi_diff(b,:), mean_phi_diff_abs(b,:)] ;
+   
+    [{bonecode(boneindex(b))}, bone.ttest.p(b,length(subject)+2), bone.ttest.sd(b,length(subject)+2)];
 
 end
+bone.phi_diff = phi_diff;
 
-
-save(append('C:\Users\kelly\GitHub\SOL_Coding_Repo\Wrist Code\bone_structs\bone.mat'),'bone')
+save(append('C:\Users\kelly\Desktop\ISB_25\DATA\bone.mat'),'bone');
+save(append('C:\Users\kelly\Desktop\ISB_25\DATA\combined.mat'),'combined');

@@ -1,17 +1,17 @@
 %% Statistical Testing - CMC 
 
-close all; clear all;
-addpath(genpath('C:\Users\Kelly\Documents\MATLAB\Github'));  %add sol coding repo to file path
-addpath(genpath('C:\Projects\Max_wrist_movement'));  %add sol coding repo to file path
-addpath(genpath('P:\GordieHardDrive\Code'));
-addpath(genpath('P:\GordieHardDrive\Gordie\Gordie Files\Code\carpal_mech_laxity_study'));
+close all; clear all; clc;
+addpath(genpath('C:\Users\kelly\GitHub'));  %add sol coding repo to file path
+% addpath(genpath('C:\Projects\Max_wrist_movement'));  %add sol coding repo to file path
+% addpath(genpath('P:\GordieHardDrive\Code'));
+% addpath(genpath('P:\GordieHardDrive\Gordie\Gordie Files\Code\carpal_mech_laxity_study'));
 
 %% Variables
 bone_registered = 11;
-files = dir('C:\Users\Kelly\Desktop\motion_test\CMC*');
+files = dir('P:\Data\2025-04-09 Carpometacarpal Pilot\E*');
 subject = {files(:).name}';
 
-directory_neutral = fullfile('C:\Users\Kelly\Desktop\motion_test',subject);
+directory_neutral = fullfile('P:\Data\2025-04-09 Carpometacarpal Pilot\E00001');
 hand = 'R';      %change per trial for all
 bone_rotated = 8;   % to check helical axis angle
 boneindex = [7, 8, 9, 10, 12, 13, 14, 15]; % skip MC1
@@ -21,11 +21,12 @@ end
 
 
 %%
-for s = 1:length(directory_neutral)
+% for s = 1:length(directory_neutral)
+s=1
     %%
-    info = getSubjectFilePath(directory_neutral{s},hand);
+    info = getSubjectFilePath(directory_neutral,hand);
     
-    directory_general = fullfile('C:\Users\Kelly\Desktop\motion_test',bonecode(bone_registered));
+    directory_general = fullfile('C:\Users\kelly\Desktop\ISB_25\pilot',bonecode(bone_registered));
 
     hand = 'R';      %change per trial for all
     p1 = nchoosek(info.series(2:end),2); %moving from position 1 to pos 2
@@ -39,7 +40,7 @@ for s = 1:length(directory_neutral)
     
     %load('P:\GordieHardDrive\carpal_lax_db\E00001\S15R\IV.files','bone'); %change first part for different people
     for b = 1:15
-        [R T mag] = getInertialInfo(fullfile(directory_neutral{s},position(1,hand),"inertia15R.dat"),b);
+        [R T mag] = getInertialInfo(fullfile(directory_neutral,position(1,hand),"inertia15R.dat"),b);
         bone.(subject{s}).(info.series{1}).(bonecode(b)).Inertia = RT_to_fX4(R,T);
     end
     
@@ -200,8 +201,8 @@ end
 
 
 
-end
-
+% end
+ 
 
 %% Box plot
 
@@ -210,10 +211,10 @@ for s = 1:length(subject)
     for b = 1:length(boneindex)
         bones_wanted(b,:) = bone.relative_angle.(subject{s})(boneindex(b),:);
         phi_wanted(b,:) = bone.phi_relative.(subject{s})(boneindex(b),:);
-        I = find(phi_wanted(b,:)<=5);
-        for X = 1:length(I)
-            bones_wanted(b,I(1,X)) = NaN;
-        end
+        % I = find(phi_wanted(b,:)<=5);
+        % for X = 1:length(I)
+        %     bones_wanted(b,I(1,X)) = NaN;
+        % end
 
     end
     x = 55*(s-1)+1;
@@ -277,7 +278,7 @@ hold off
 %%  Statistical Testing
 
 for s = 1:length(subject)
-    mean_phi = mean(bone.phi.(subject{s})')'
+    mean_phi = nanmean(bone.phi.(subject{s})')'
     
     for b = 1:length(boneindex)
         temp = all_phi(b,:)';
@@ -337,4 +338,4 @@ for b = 1:length(boneindex)
 
 end
 
-save(append('C:\Users\kelly\GitHub\SOL_Coding_Repo\Wrist Code\bone_structs\bone.mat'),'bone')
+save(append('C:\Users\kelly\Desktop\ISB_25\DATA\bone_pilot.mat'),'bone')

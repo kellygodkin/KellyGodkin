@@ -11,23 +11,25 @@ addpath(genpath('C:\Users\kelly\GitHub'));
 
 load('P:\Data\2025-04-09 Carpometacarpal Pilot\preprocessing\structures\bonestruct_S2WV.mat',"bonestruct");     % Filepath where the bonestructure is saved
 % load(fullfile(filepath,'bonestruct.mat','bonestruct'));
-dbdir =   'P:\Data\2025-04-09 Carpometacarpal Pilot' ;     % database directory
+dbdir =   'P:\Data\2025-04-09 Carpometacarpal Pilot\preprocessing\CMC001\transforms\split_tras\bones16_end' ;     % database directory
 positions = [15,02,03,04,05,06];   %06,07,08,09,10,11,12,13,14
 positions2 = {'S15R','S02R','S03R','S04R','S05R','S06R'};
-files = dir(fullfile(filepath_base,'CMC*'));
+files = dir(fullfile(filepath_base,'E*'));
 subject = {files(1:end).name}';
 %%
 for s = 1%:numel(fields(bonestruct.rad))
     x = 0;
     for p = positions
         x = x+1;
-        for b = 1:numel(fields(bonestruct))
+        for b = 1:15%numel(fields(bonestruct))
             inertia15R(b*5-2: b*5, 1:3) = bonestruct.(bonecode_hand(b))(s).transforms.S15R(1:3,1:3);
             inertia15R(b*5-4, 1:3) =  bonestruct.(bonecode_hand(b))(s).transforms.S15R(1:3,4)';
             inertia15R(b*5-3, 1:3) = bonestruct.(bonecode_hand(b))(s).CoM_ev123;
             volume15R = bonestruct.(bonecode_hand(b))(s).volume;
-            ACS_rad = bonestruct.rad(s).csys_fixed;
-            ACS_uln = bonestruct.uln(s).csys_fixed;
+            ACS_rad(1:3,1:3) = bonestruct.rad(s).csys_fixed(1:3,1:3);
+            ACS_uln(1:3,1:3) = bonestruct.uln(s).csys_fixed(1:3,1:3);
+            ACS_rad(4,1:3) = bonestruct.rad(s).csys_fixed(1:3,4);
+            ACS_uln(4,1:3) = bonestruct.uln(s).csys_fixed(1:3,4);
 
             poseTdata(b*4-3: b*4-1, 1:3) = bonestruct.(bonecode_hand(b))(s).transforms.(positions2{x})(1:3,1:3);
             poseTdata(b*4, 1:3) = bonestruct.(bonecode_hand(b))(s).transforms.(positions2{x})(1:3,4)';
@@ -46,7 +48,7 @@ for s = 1%:numel(fields(bonestruct.rad))
     end
 end
 
-%% Saving IV files -- does not work use move_files
+% % Saving IV files -- does not work use move_files
 % p = 1;
 % for s = 1:length(subject)
 %     for b = 1:numel(fields(bonestruct))

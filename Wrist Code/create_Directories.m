@@ -10,10 +10,10 @@ clc
 
 
 preprocessing_dir =   'P:\Data\2025-04-09 Carpometacarpal Pilot\preprocessing';  % preprocessing directory 
-filepath_base =  'P:\Data\2025-04-09 Carpometacarpal Pilot';       % base for final data
+filepath_base =  'P:\Data\2025-04-09 Carpometacarpal Pilot\preprocessing\CMC001\transforms\split_tras\bones1_15';       % base for final data
 participants = 1 ;     % set as number of participants
-prefix = {'CMC'};       % set as preferred prefix for file dir
-positions = [02,03,04,05,06,07,08,09,10,15];
+prefix = {'E00'};       % set as preferred prefix for file dir
+positions = [02,03,04,05,06,15];%07,08,09,10,
 
 
 

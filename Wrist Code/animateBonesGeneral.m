@@ -1,6 +1,7 @@
 % animate a trial
 clear
 clc
+addpath(genpath('C:\Users\kelly\GitHub'))
 % Select all the necessary directories and the bones to animate
 
 uiwait(msgbox('Please look at the header of the following file explorer boxes to know which folder to select.','Information','modal'))
@@ -122,7 +123,7 @@ for bn = 1:nbones
     % make the linked IV files
     ivstring = createInventorHeader();
     % make the linked iv file
-    ivstring = [ivstring createInventorLink([ivDir bone_list{bn}],eye(3,3),zeros(3,1),[0.7 0.7 0.7],0.5)];
+    ivstring = [ivstring createInventorLink([ivDir bone_list{bn}],eye(3,3),zeros(3,1))];
 
     fid = fopen(fullfile(rigidivDir,[bonesCell{bn} '.iv']),'w');
     fprintf(fid,ivstring);

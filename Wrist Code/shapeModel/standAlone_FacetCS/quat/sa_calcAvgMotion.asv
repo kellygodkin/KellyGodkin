@@ -1,0 +1,91 @@
+function [avgHAM,num] = sa_calcAvgMotion(kinemat,checkNums)
+% Usage:   [avgHAM, num] = calcAvgMotion(kinemat, checkNums)
+%
+% Inputs:   kinemat -   a) a kinemat structure, pre-loaded
+%                       b) a kinemat file name, not yet loaded
+%                       c) a list of HAMs
+%		    checkNums(optional) - array of numbers corresponding to kinemat
+%		    rows to check  (ie checkNums = 2:5, only use kinemat(2:5))
+%
+% Ouputs:   avgHAM - the Average HAM
+%           num - The number of subjects and series that went INTO that average HAM
+%
+
+
+count = 0;
+if isa(kinemat, 'double') % In case input is a list of HAMs, handle it as such and weed out small angles
+    for ii = 1:size(kinemat,1)
+        count = count + 1;
+        myHAM = kinemat(count,:);
+        if myHAM(1) < 3   %NEW MODIFICATION
+            % 			count = count -1;   %%%%
+            disp('Skipped.  Angle too small.'); %%%%
+        else  %%%%
+            allQuat{1}(count,:) = double(sa_quaternion(kinemat(count,2:4),kinemat(count,1)*pi/180));
+            if (ii ~= 1)
+                gg = dot(allQuat{1}(count,:),allQuat{1}(1,:));
+                if (norm(allQuat{1}(count,:) - allQuat{1}(1,:)) > norm(allQuat{1}(count,:) + allQuat{1}(1,:)))
+                    allQuat{1}(count,:) = -allQuat{1}(count,:);
+                end
+            end
+            allHAM{1}(count,:) = myHAM;
+        end
+    end
+    avgHAM = avgCalc(allQuat,allHAM,count);
+else
+    if isa(kinemat, 'char') %See if it's a file name
+        kinemat = load(kinemat);
+    end
+    if ~exist('checkNums','var')
+        checkNums = 1:size(kinemat,2);
+    end
+    for boneCount = 1:size(kinemat(1).selBone,1)
+        count = 0;
+        for subjCount = checkNums
+            for serCount = 1:size(kinemat(subjCount).RTdata,1)
+                count = count + 1;
+                myHAM = kinemat(subjCount).RTdata{serCount,3}(boneCount,:);
+                if myHAM(1) < 1  %NEW MODIFICATION
+                    count = count -1;   %%%%
+                    disp('Skipped.  Angle too small.'); %%%%
+                else  %%%%
+                    allQuat{boneCount}(count,:) = double(sa_quaternion(myHAM(2:4),myHAM(1)*pi/180));
+                    allHAM{boneCount}(count,:) = myHAM;
+                    if (count ~= 1)
+                        gg = abs(dot(allQuat{boneCount}(count,:),allQuat{boneCount}(1,:)));
+                        % if (gg < 0)
+                        %     allQuat{boneCount}(count,:) = -allQuat{boneCount}(count,:);
+                        % end
+                    end
+                end  %end of if myHAM(1)
+            end %end of for serCount;
+        end %end of for subjCount;
+        avgHAM(boneCount,:) = avgCalc(allQuat,allHAM,count,boneCount);
+        num(boneCount) = size(allQuat{boneCount},1);
+    end % end of for boneCount;
+end
+
+function [avgHAM] = avgCalc(allQuat,allHAM,count,boneCount);
+if ~exist('count','var')
+    count = size(allHAM{1},1);
+end
+if ~exist('boneCount','var')
+    boneCount = 1;
+end
+if count ==1
+    warning('Only averaging one position');
+end
+sumQuat = sum(allQuat{boneCount},1);
+% sumQuat(2,1) = sum(allQuat{boneCount,1}(2,:));
+% sumQuat(3,1) = sum(allQuat{boneCount,1}(3,:));
+% sumQuat(4,1) = sum(allQuat{boneCount,1}(4,:));
+avgQuat = sumQuat/norm(sumQuat);
+% [avgPhi,avgN] = q2Axis(sa_quaternion(avgQuat));
+avgPhi = 2*acos(avgQuat(1))*180/pi;
+avgN = avgQuat(2:4);
+avgN = avgN/norm(avgN);
+avgT = sum(allHAM{1}(:,5),1)/count;
+avgQLoc = sum(allHAM{1}(:,6:8),1)/count;
+avgHAM = [avgPhi,avgN,avgT,avgQLoc];
+
+

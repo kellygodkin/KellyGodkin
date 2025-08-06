@@ -1,0 +1,1 @@
+function [intersect, dist] = min_dist_P_line(P1,P2,P3);%Calulates the shortest distance between P3 and line defined by P2|P1% Also returns the point of intersection on P2|P1.% Based on Paul Bourke, October, 1988.	line = P2 - P1;	u = (dot(P3,line) - dot(P1,line))/dot(line,line);	intersect = P1 + u*(line);	dist = norm(intersect - P3);
