@@ -9,7 +9,7 @@ t1 = t/2;  % half the slice thickness
 % use mimics and go from scan 0 to the top scan of the ulna
 % slh = 59;
 
-for s = 1%:numel(fields(bonestruct.uln))
+for s = 1:size(bonestruct.rad,2)
     pts = bonestruct.uln(s).global.pts;
     cnt = bonestruct.uln(s).global.cnt;
     cnt = cnt(:,1:3) +1;

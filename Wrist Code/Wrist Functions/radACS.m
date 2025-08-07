@@ -21,7 +21,7 @@ t1 = t/2;  % half the slice thickness
 % end
 % rad_styloid_dir = 2
 
-for s = 1:numel(fields(bonestruct.rad))
+for s = 1:size(bonestruct.rad,2)
     pts = bonestruct.rad(s).global.pts;
     cnt = bonestruct.rad(s).global.cnt;
     cnt = cnt(:,1:3) +1;

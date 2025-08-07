@@ -1,6 +1,7 @@
 %% Shape Model of the Wrist 3 non - rigid CPD (CUDA)
 % Ensure that the reference is downsampled and the other bones are
 % upsampled
+% NOTE CANNOT RUN ON LAPTOP!!!!
 %  (code 8)
 % by: Kelly Godkin
 % Updated:jul 4th 25

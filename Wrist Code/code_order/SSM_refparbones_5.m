@@ -95,4 +95,3 @@ for b = 1:numel(fields(bonestruct))
     copyfile(oldFullPath, newFullPath);
     fprintf('Copied %s to %s\n', oldFileName, newFileName);
 end
-eul()
