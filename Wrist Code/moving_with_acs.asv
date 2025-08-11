@@ -5,7 +5,7 @@ clear all;
 clc;
 
 addpath(genpath('C:\Users\kelly\GitHub'));  
-
+addpath(genpath('C:\Users\kelly\GitHub'));  
 filepath_base = 'P:\Data\2025-04-09 Carpometacarpal Pilot';
 
 

@@ -16,7 +16,7 @@ bone_registered = 11;
 hand = 'R';
 load(fullfile(filepath_base,'preprocessing\structures\bonestruct_refpar.mat'),"bonestruct");
 positions = {'S15R','S02R','S03R','S04R','S05R','S06R'};
-files = dir(fullfile(filepath_base,'E*'));
+files = dir(fullfile(filepath_base,'CMC*'));
 subject = {files(1:end).name}';
 p1 = nchoosek(positions,2);
 colour = jet(31);
