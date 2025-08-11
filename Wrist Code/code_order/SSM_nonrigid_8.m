@@ -64,16 +64,25 @@ patch_bonetype_hand(bonestruct, bones, numel(fields(bonestruct)), 'cpdR') % visu
 
 for b = 1:numel(fields(bonestruct))
 
-    for s = 1:length(subject)+1
+    for s = 1:length(subject)
         bonestruct.(bonecode_hand(b))(s).cpdNR1unscaled.pts = bonestruct.(bonecode_hand(b))(s).cpdNR1.pts/bonestruct.(bonecode_hand(b))(s).cpdR.s;
         bonestruct.(bonecode_hand(b))(s).cpdNR1unscaled.cnt = bonestruct.(bonecode_hand(b))(s).cpdNR1.cnt;
     end
 end
+for b = 1:numel(fields(bonestruct))
+
+    s = length(subject)+1;
+    bonestruct.(bonecode_hand(b))(s).cpdNR1unscaled.pts = bonestruct.(bonecode_hand(b))(s).cpdR.pts;
+    bonestruct.(bonecode_hand(b))(s).cpdNR1unscaled.cnt = bonestruct.(bonecode_hand(b))(s).cpdR.cnt;
+    bonestruct.(bonecode_hand(b))(s).cpdNR1.cnt = bonestruct.(bonecode_hand(b))(s).cpdR.cnt;
+   bonestruct.(bonecode_hand(b))(s).cpdNR1.pts = bonestruct.(bonecode_hand(b))(s).cpdR.pts;
+end
+
 
 %% procrustes: alignment and scaling
 
 for b = 1:numel(fields(bonestruct))
-    for s = 1:length(subject)
+    for s = 1:length(subject)+1
         [~, bonestruct.(bonecode_hand(b))(s).procrustes.pts, bonestruct.(bonecode_hand(b))(s).procrustes.T] = procrustes(bonestruct.(bonecode_hand(b))(length(subject)+1).cpdNR1unscaled.pts,bonestruct.(bonecode_hand(b))(s).cpdNR1unscaled.pts);
         bonestruct.(bonecode_hand(b))(s).procrustes.cnt = bonestruct.(bonecode_hand(b))(s).cpdNR1.cnt;
     end
@@ -82,7 +91,7 @@ end
 %% find mean bone from procrustes aligned bones
 
 for b = 1:numel(fields(bonestruct))
-    m = 'mean_' + bonecode_hand(b);
+    m = append('mean_',bonecode_hand(b));
     total = zeros(size(bonestruct.(bonecode_hand(b))(length(subject)+1).procrustes.pts));
     for s = 1:length(subject)
         total = total + bonestruct.(bonecode_hand(b))(s).procrustes.pts;
@@ -93,8 +102,8 @@ end
 
 figure;
 for b = 1:numel(fields(bonestruct))
-    m = 'mean_' + bonecode_hand(b);
-    subplot(6,6,i);axis equal;
+    m = append('mean_',bonecode_hand(b));
+    subplot(6,6,b);
     patch('faces', mean_bones.(m).cnt, 'vertices', mean_bones.(m).pts, 'FaceColor', colour(b,:), 'FaceAlpha', .5, 'EdgeAlpha', 0.8);
 end
 uiwait(msgbox('this is the mean bones'));
@@ -102,3 +111,10 @@ close all
 
 %% scale and align cpdR bones
 % for the second non-rigid coherent point drift, we want the original number of bone points, not the decimated version from cpdNR1
+
+
+save('P:\Personnel\KellyGodkin\bonestruct_nonrigid.mat','bonestruct')
+
+
+
+
